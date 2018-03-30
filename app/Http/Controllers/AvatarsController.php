@@ -40,12 +40,11 @@ class AvatarsController extends Controller
         //         "mail":"basil.soubrevilla@wanadoo.fr",
         //         "link":"https:\/\/bhlprojet-lbarbe.c9users.io\/BHLprojet\/resources\/assets\/images\/29318143144Rufus.jpg"
                 
-        //     }];
+        //     }]
           
          for ($i = 0; $i < sizeof($listAvatars); $i++) {
               $sortie[$listAvatars[$i]->mail] = $listAvatars[$i]->link;
          }
-        
         return $sortie;
          
     }
@@ -170,6 +169,22 @@ class AvatarsController extends Controller
     
     public function informations()
     {
-        $file = fopen("version.csv"
+        $j=0;
+        $file = fopen("http://adartza.iutbayonne.univ-pau.fr/~bsoubrevilla/version.txt", "r");
+        while(!feof($file))
+        {
+            $ligne = fgets($file);
+    		if(!empty($ligne))
+    		{
+    			$tabLigne = explode("|", $ligne);
+    			$apiVersion = $tabLigne[0];
+    			$sizes = $tabLigne[1];
+    	    	$defaultSize = $tabLigne[2];
+    			$formats = $tabLigne[3];
+    		}
+        }
+        fclose($file);
+		$arrayJson =  array('APIVersion' => $apiVersion, 'sizes' => $sizes, 'defaultSize' => $defaultSize, 'formats' => $formats);
+		return json_encode($arrayJson);
     }
 }
