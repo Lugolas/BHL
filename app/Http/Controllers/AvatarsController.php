@@ -167,4 +167,9 @@ class AvatarsController extends Controller
         $avatar = Avatars::where('mail', '=', $mail)->delete();
         return "Deleted";
     }
+    
+    public function informations()
+    {
+        $file = fopen("version.csv"
+    }
 }
