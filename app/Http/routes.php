@@ -32,3 +32,7 @@ Route::get('/listAvatars/{email}','AvatarsController@index')->name('listAvatars.
 Route::get('/deleteForm', 'HomeController@deleteForm');
 
 Route::delete('/deletedForm', 'AvatarsController@deleteAvatar')->name('deleteAvatar');
+
+Route::get('/API', 'AvatarsController@informations');
+
+Route::get('/test/{url}', 'AvatarsController@removeBackSlash');

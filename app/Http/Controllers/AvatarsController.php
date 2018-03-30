@@ -8,6 +8,7 @@ use App\Http\Requests\AddFormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Intervention\Image\Facades\Image;
 
 use App\Avatars;
 
@@ -20,6 +21,9 @@ class AvatarsController extends Controller
      */
     public function index($mail)
     {
+        // $user = User::where('email','=',$mail)->first();
+        // $avatars = $user->avatars();
+        
         $idMail = DB::table('users')
                     ->select('id')
                     ->where('email','=',$mail)
@@ -29,23 +33,12 @@ class AvatarsController extends Controller
                         ->select('mail','link')
                         ->where('users_id','=',$idMail[0]->id)
                         ->get();
-        
-        // $listAvatars = [
-        //     {
-        //         "mail":"basil.soubrevilla@orange.fr",
-        //         "link":"https:\/\/bhlprojet-lbarbe.c9users.io\/BHLprojet\/resources\/asset\/images\/Rufus.jpg"
-                
-        //     },
-        //     {
-        //         "mail":"basil.soubrevilla@wanadoo.fr",
-        //         "link":"https:\/\/bhlprojet-lbarbe.c9users.io\/BHLprojet\/resources\/assets\/images\/29318143144Rufus.jpg"
-                
-        //     }]
-          
+       
          for ($i = 0; $i < sizeof($listAvatars); $i++) {
               $sortie[$listAvatars[$i]->mail] = $listAvatars[$i]->link;
          }
-        return $sortie;
+         
+         return $sortie;
          
     }
 
@@ -99,9 +92,8 @@ class AvatarsController extends Controller
      */
     public function show($mail)
     {
-        $avatars = DB::table('avatars')->where('mail',$mail)->first();
-        $link = $avatars->link;
-        return $link;
+        $link = Avatars::get()->where('mail',$mail)->pluck('link')->first();
+        return Image::make($link)->response();
     }
 
     /**
@@ -170,7 +162,7 @@ class AvatarsController extends Controller
     public function informations()
     {
         $j=0;
-        $file = fopen("http://adartza.iutbayonne.univ-pau.fr/~bsoubrevilla/version.txt", "r");
+        $file = fopen("https://bhlprojet-lbarbe.c9users.io/BHLprojet/public/version.txt", "r");
         while(!feof($file))
         {
             $ligne = fgets($file);
@@ -187,4 +179,15 @@ class AvatarsController extends Controller
 		$arrayJson =  array('APIVersion' => $apiVersion, 'sizes' => $sizes, 'defaultSize' => $defaultSize, 'formats' => $formats);
 		return json_encode($arrayJson);
     }
+    
+    /*protected function removeBackSlash($url)
+    {
+        $tabUrl = explode('\\', $url);
+        $link = "";
+        foreach($tabUrl as $part)
+        {
+            $link = $link . $part;
+        }
+        echo $link;
+    }*/
 }

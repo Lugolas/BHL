@@ -13,7 +13,7 @@ class CreateAvatarsTable extends Migration
     public function up()
     {
         Schema::create('Avatars', function (Blueprint $table) {
-            $table->string('userEmail')->unique();
+            $table->string('mail')->unique();
             $table->string('link');
             $table->integer('users_id')->unsigned();
             $table->foreign('users_id')

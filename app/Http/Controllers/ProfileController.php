@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Http\Controllers\AvatarsController;
-
+use App\Avatars;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,9 +12,7 @@ class ProfileController extends Controller
 {
     public function openProfile()
     {
-       
-        
-        $emails = "https://bhlprojet-lbarbe.c9users.io/BHLprojet/public/listAvatars/".Auth::user()->email;
+        $emails = Avatars::get()->pluck('link','mail')->toArray();
         return view('userprofile',['emails' => $emails]);
     }
     

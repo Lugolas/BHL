@@ -15,12 +15,17 @@
 
 @section('listeAvatars')
 <div class="container">
-    la liste des Avatarss
-    {!! $emails !!}
-    @foreach ($emails as $email => $image)
-        <p>L'email {{ $email }} puis le l'image </p>
-        <img src={{$image}} height="100" width="100" alt="tu peux pas voir tant pis"></img>
-    @endforeach
-    
+    la liste des Avatars
+    </br>
+    <div class="container">
+        <div class="row">
+            @foreach ($emails as $email => $image)
+                <div class="col-md-4">
+                    <img src="{!! $image !!}" alt="" width="100px" height="100px"/><br />
+                    <p>{!! $email !!}</p>
+                </div>
+            @endforeach
+         </div>
+    </div>
 </div>
 @endsection
