@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\AddFormRequest;
+use App\Http\Requests\ModifyFormRequest;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Input;
 
+use App\User;
 use App\Avatars;
 
 class AvatarsController extends Controller
@@ -21,25 +25,17 @@ class AvatarsController extends Controller
      */
     public function index($mail)
     {
-        // $user = User::where('email','=',$mail)->first();
-        // $avatars = $user->avatars();
+        $sortie = NULL;
+        $user = User::where('email',$mail)->first();
+        if (is_null($user)){
+            return $sortie;
+        }
+        $listAvatars = $user->avatars;
         
-        $idMail = DB::table('users')
-                    ->select('id')
-                    ->where('email','=',$mail)
-                    ->get();
-                   
-        $listAvatars = DB::table('avatars')
-                        ->select('mail','link')
-                        ->where('users_id','=',$idMail[0]->id)
-                        ->get();
-       
-         for ($i = 0; $i < sizeof($listAvatars); $i++) {
-              $sortie[$listAvatars[$i]->mail] = $listAvatars[$i]->link;
-         }
-         
-         return $sortie;
-         
+        for ($i = 0; $i < sizeof($listAvatars); $i++) {
+            $sortie[$listAvatars[$i]->mail] = $listAvatars[$i]->link;
+        }
+        return $sortie;
     }
 
     /**
@@ -72,13 +68,17 @@ class AvatarsController extends Controller
             $destinationPath = resource_path().'/assets'.'/images/';
             $image->move($destinationPath, $input['imagename']);
             $response = new Avatars();
-            $response->mail = $request->input('mail');
-            $link = $input['imagename'];
-            $link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/'.$link;
+            $response->mail = str_replace('/', '', hash('sha256',$request->input('mail')));
+            $response->mail_aff = $request->input('mail');
+            $link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/'.$input['imagename'];
             $response->link = $link;
             $response->users_id = Auth::user()->id;
-            $response->save();
-            return "Formulaire bien rempli !";
+            if(!$response->save()){
+                return redirect('/profile');
+            }else{
+                return redirect()->back();
+            }
+            
         }
     }
 
@@ -93,6 +93,7 @@ class AvatarsController extends Controller
     public function show($mail)
     {
         $link = Avatars::get()->where('mail',$mail)->pluck('link')->first();
+        if(is_null($link)) $link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/noAvatar.png';
         return Image::make($link)->response();
     }
 
@@ -111,10 +112,9 @@ class AvatarsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ModifyFormRequest $request)
     {
         $validator = Validator::make($request -> all(), $request->rules(), $request -> messages());
         if($validator->fails())
@@ -123,18 +123,15 @@ class AvatarsController extends Controller
         }
         if($validator->passes())
         {
+            $avatar = Avatars::where('mail', $request->input('mail'));
             $image = $request->file('image');
             $input['imagename'] = date('dnyHis').$image->getClientOriginalName();
             $destinationPath = resource_path().'/assets'.'/images/';
             $image->move($destinationPath, $input['imagename']);
-            $response = new Avatars();
-            $response->mail = $request->input('mail');
             $link = $input['imagename'];
             $link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/'.$link;
-            $response->link = $link;
-            $response->users_id = Auth::user()->id;
-            $response->save();
-            return "Formulaire bien rempli !";
+            $avatar->update(['link' => $link]);
+            return redirect('/profile');
         }
     }
 
@@ -154,9 +151,14 @@ class AvatarsController extends Controller
     
     public function deleteAvatar(Request $request)
     {
-        $mail = $request->input('mail');
-        $avatar = Avatars::where('mail', '=', $mail)->delete();
-        return "Deleted";
+        $data = Input::get('ch');
+        if(!is_null($data)){
+            foreach($data as $id)
+            {
+                $avatar = Avatars::where('mail', '=', $id)->delete();
+            }
+        }
+        return redirect('/profile');
     }
     
     public function informations()
@@ -179,15 +181,4 @@ class AvatarsController extends Controller
 		$arrayJson =  array('APIVersion' => $apiVersion, 'sizes' => $sizes, 'defaultSize' => $defaultSize, 'formats' => $formats);
 		return json_encode($arrayJson);
     }
-    
-    /*protected function removeBackSlash($url)
-    {
-        $tabUrl = explode('\\', $url);
-        $link = "";
-        foreach($tabUrl as $part)
-        {
-            $link = $link . $part;
-        }
-        echo $link;
-    }*/
 }

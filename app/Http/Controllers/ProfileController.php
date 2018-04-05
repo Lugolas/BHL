@@ -12,11 +12,10 @@ class ProfileController extends Controller
 {
     public function openProfile()
     {
-        $emails = Avatars::get()->pluck('link','mail')->toArray();
+        $user = Auth::user()->id;
+        if(is_null($user)) return redirect('/login');
+        $emails = Avatars::select('link','mail','mail_aff')->where('users_id',$user)->get();
         return view('userprofile',['emails' => $emails]);
     }
     
-    public function getAvatar(){
-        
-    }
 }

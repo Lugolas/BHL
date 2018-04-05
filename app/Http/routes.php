@@ -19,7 +19,7 @@ Route::auth();
 
 Route::get('/home', 'HomeController@index');
 
-Route::get('/formEmail', 'HomeController@formEmail');
+Route::get('/formEmail/{email?}', 'HomeController@formEmail');
 
 Route::get('/profile', 'ProfileController@openProfile');
 
@@ -31,8 +31,10 @@ Route::get('/listAvatars/{email}','AvatarsController@index')->name('listAvatars.
 
 Route::get('/deleteForm', 'HomeController@deleteForm');
 
-Route::delete('/deletedForm', 'AvatarsController@deleteAvatar')->name('deleteAvatar');
+Route::delete('/deletedForm', 'AvatarsController@deleteAvatar')->name('deletedAvatar');
 
 Route::get('/API', 'AvatarsController@informations');
 
-Route::get('/test/{url}', 'AvatarsController@removeBackSlash');
+Route::get('/modifyForm', 'AvatarsController@update')->name('modifyFormEmail');
+
+Route::post('/deleteAvatar', 'AvatarsController@deleteAvatar')->name('deleteAvatars');

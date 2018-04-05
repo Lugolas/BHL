@@ -24,7 +24,16 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    
+    public function avatars() {
+        return $this->hasMany(Avatars::class,'users_id');
+    }
+
+    // public function avatarsByEmail() {
+    //     return $this->hasMany(Avatars::class)->orderBy('userEmail');
+    // }
+
     public function emails() {
-        return $this->hasMany(Avatars::class);
+        return $this->avatars->pluck('userEmail');
     }
 }

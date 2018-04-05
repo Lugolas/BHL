@@ -7,9 +7,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Bienvenue !</div>
 
-                <div class="panel-body">
-                    Wesheuh wesheuh poto
-                    <img src="/BHLprojet/resources/assets/images/Fromdu.jpg">
+                <div class="panel-body">c'est notre super site gravatar
                 </div>
             </div>
         </div>

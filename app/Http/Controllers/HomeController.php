@@ -24,12 +24,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('welcome');
     }
     
-    public function formEmail()
+    public function formEmail($email=null)
     {
-        return view('addFormEmail');
+        if($email == null || $email == "")
+            return view('addFormEmail');
+        else
+            return view('modifyFormEmail', ['email' => $email]);
     }
     public function deleteForm()
     {

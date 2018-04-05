@@ -6,9 +6,6 @@
         @yield('nomUtilisation')
     </div>
      <div class="row">
-        @yield('option')
-    </div>
-     <div class="row">
         @yield('listeAvatars')
     </div>
 </div>
