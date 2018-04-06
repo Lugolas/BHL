@@ -26,12 +26,8 @@ Route::get('/profile', 'ProfileController@openProfile');
 Route::resources([
     'avatars' => 'AvatarsController'
 ]);
-//  avatars/email -> show
+
 Route::get('/listAvatars/{email}','AvatarsController@index')->name('listAvatars.index');
-
-Route::get('/deleteForm', 'HomeController@deleteForm');
-
-Route::delete('/deletedForm', 'AvatarsController@deleteAvatar')->name('deletedAvatar');
 
 Route::get('/API', 'AvatarsController@informations');
 

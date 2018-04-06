@@ -26,30 +26,23 @@ class AvatarsController extends Controller
     public function index($mail)
     {
         $sortie = NULL;
+        //get current user 
         $user = User::where('email',$mail)->first();
+        //end if doesn't exist
         if (is_null($user)){
             return $sortie;
         }
+        //get all user's avartars 
         $listAvatars = $user->avatars;
-        
+        //put all in associative array
         for ($i = 0; $i < sizeof($listAvatars); $i++) {
             $sortie[$listAvatars[$i]->mail] = $listAvatars[$i]->link;
         }
         return $sortie;
     }
-
+    
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Show the form for creating a new resource and store it in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -63,20 +56,28 @@ class AvatarsController extends Controller
         }
         if($validator->passes())
         {
-            $image = $request->file('image');
-            $input['imagename'] = date('dnyHis').$image->getClientOriginalName();
-            $destinationPath = resource_path().'/assets'.'/images/';
-            $image->move($destinationPath, $input['imagename']);
-            $response = new Avatars();
-            $response->mail = str_replace('/', '', hash('sha256',$request->input('mail')));
-            $response->mail_aff = $request->input('mail');
-            $link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/'.$input['imagename'];
-            $response->link = $link;
-            $response->users_id = Auth::user()->id;
-            if(!$response->save()){
-                return redirect('/profile');
+            //verification if email already exist
+            $mail = $request->input('mail');
+            if (is_null(Avatars::where('mail_aff',$mail)->first())){
+            
+                //create image in ressources
+                $image = $request->file('image');
+                $input['imagename'] = date('dnyHis').$image->getClientOriginalName();
+                $destinationPath = resource_path().'/assets'.'/images/';
+                $image->move($destinationPath, $input['imagename']);
+                //add image in DB
+                $response = new Avatars();
+                $response->mail = str_replace('/', '', hash('sha256',$mail));
+                $response->mail_aff = $mail;
+                $response->link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/'.$input['imagename'];
+                $response->users_id = Auth::user()->id;
+                if(!$response->save()){
+                    return redirect('/profile');
+                }else{
+                    return redirect()->back()->withErrors(['msg'=>'Erreur lors de l\'enregistrement dans la base de données. Veuillez réessayer plus tard']);
+                }
             }else{
-                return redirect()->back();
+                return redirect()->back()->withErrors(['msg'=>'mail déjà existant']);
             }
             
         }
@@ -92,6 +93,7 @@ class AvatarsController extends Controller
      */
     public function show($mail)
     {
+        
         $link = Avatars::get()->where('mail',$mail)->pluck('link')->first();
         if(is_null($link)) $link = 'https://bhlprojet-lbarbe.c9users.io/BHLprojet/resources/assets/images/noAvatar.png';
         return Image::make($link)->response();
